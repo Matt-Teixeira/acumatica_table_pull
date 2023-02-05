@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.log
+controllers/acumaticaAPI/testData.js
+db/backup/*.tar
+deltaStore
+*.sh
+migrationQueries/
