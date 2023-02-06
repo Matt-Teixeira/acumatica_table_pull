@@ -5,3 +5,4 @@ controllers/acumaticaAPI/testData.js
 db/backup/*.tar
 deltaStore
 migrationQueries/
+*.pem
