@@ -4,5 +4,4 @@ node_modules/
 controllers/acumaticaAPI/testData.js
 db/backup/*.tar
 deltaStore
-*.sh
 migrationQueries/
