@@ -53,7 +53,7 @@ const loadCaseData = async () => {
 	const data = JSON.parse(fs.readFileSync('files/data.txt', 'utf-8'))
 	return data.data
 }
-const getCaseData = async () => {
+const loginAcumaticaApi = async () => {
 	const login = await axios.post(process.env.LOGIN_URI, {
 		name: process.env.LOGIN_NAME,
 		password: process.env.LOGIN_PW,
@@ -63,11 +63,13 @@ const getCaseData = async () => {
 		console.log("login")
 	}
 
-	const cookie = parseCookie(login)
-
+	return parseCookie(login)
+}
+const getCaseData = async () => {
+	const loginCookie = await loginAcumaticaApi()
 	const cases = await axios.put(process.env.CASES_URI, {}, {
 		headers: {
-			Cookie: cookie
+			Cookie: loginCookie
 		}
 	})
 	if (process.env.DEBUG) {
