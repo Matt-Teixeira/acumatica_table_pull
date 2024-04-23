@@ -1,0 +1,24 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "1.0.0",
+	"configurations": [
+		{
+			"name": "dev",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceRoot}/index.js",
+			"console": "integratedTerminal",
+			"envFile": "${workspaceRoot}/.env.dev"
+		},
+		{
+			"name": "deployment",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceRoot}/index.js",
+			"console": "integratedTerminal",
+			"envFile": "${workspaceRoot}/.env"
+		}
+	]
+}
