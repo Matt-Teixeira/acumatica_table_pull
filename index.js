@@ -17,28 +17,6 @@ const on_boot = async () => {
 	//  });
 	//}
 
-	//const req = await fetch(process.env.LOGIN_URI, {
-	//	method: 'POST',
-	//	credentials: 'include',
-	//	headers: {
-	//		'Content-Type': 'application/json',
-	//	},
-	//	body: JSON.stringify({
-	//		name: process.env.LOGIN_NAME,
-	//		password: process.env.LOGIN_PW,
-	//		company: process.env.LOGIN_COMPANY
-	//	})
-	//})
-	//console.log('login request completed')
-	//
-	//const req2 = await fetch(process.env.EQUIP_URI, {
-	//	method: 'PUT',
-	//	credentials: 'include',
-	//	body: {
-	//	}
-	//})
-	//console.log('Equipment request completed')
-
 	const sqlData = await database.getData()
 
 	const cases = process.env.DEBUG ? await loadCaseData() : await getCaseData()
@@ -59,30 +37,6 @@ const on_boot = async () => {
 			}
 		}
 	}
-
-	//const keepAliveAgent1 = new https.Agent({ keepAlive: true })
-	//const options1 = {
-	//	agent: keepAliveAgent1,
-	//	//host: 'acumaticasb.avantehs.com/entity/auth/login',
-	//	host: 'acumaticasb.avantehs.com',
-	//	//defaults to 443 if undefined
-	//	//port: 443,
-	//	path: '/entity/auth/login',
-	//	method: 'POST'
-	//}
-	//var req = https.request(options1, function (res) { })
-	//req.on('error', function (e) {
-	//	console.log('problem with request: ' + e.message)
-	//})
-	//req.end()
-
-	//const keepAliveAgent2 = new http.Agent({ keepAlive: true })
-	//const options2 = {
-	//	agent: keepAliveAgent,
-	//	host: 'https://acumaticasb.avantehs.com/entity/AHS/18.200.003/CasesRTT?$expand=CasesRTTDetails',
-	//	method: 'PUT'
-	//}
-	//http.request(options, onResponseCallback)
 }
 const compareRecords = (n, old) => {
 	const changes = {}
@@ -129,18 +83,22 @@ const getCaseData = async () => {
 }
 
 const unNestCase = (c) => {
-	const newCase = {}
-	for (prop in c) {
-		newCase[prop] = null
-		if (c[prop] != null) {
-			if (Object.keys(c[prop]).length != 0) {
-				newCase[prop] = c[prop].hasOwnProperty('value') ? c[prop].value : c[prop]
-			}
-		}
-	}
+	const newCase = unNestObject(c)
 	newCase.acumatica_id = newCase.id
 	delete newCase.id
 	return newCase
+}
+const unNestObject = (c) => {
+	const newObject = {}
+	for (prop in c) {
+		newObject[prop] = null
+		if (c[prop] != null) {
+			if (Object.keys(c[prop]).length != 0) {
+				newObject[prop] = c[prop].hasOwnProperty('value') ? c[prop].value : c[prop]
+			}
+		}
+	}
+	return newObject
 }
 
 const parseCookie = (response) => {
