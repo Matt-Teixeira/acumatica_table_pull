@@ -13,22 +13,19 @@ const pool = new Pool({
 		rejectUnauthorized: true,
 	}
 })
-module.exports.insertCase = async (c) => {
-	const props = []
-	for (prop in c) {
-		props.push(prop)
-	}
-	let query = 'insert into public.cases('
+module.exports.insertRecord = async (table, object) => {
+	const props = Object.keys(object)
+	let query = `insert into ${table}(`
 	for (const [i, prop] of props.entries()) {
 		query += `"${prop}"`
 		query += (i == props.length - 1) ? '' : ', '
 	}
 	query += ') values ('
 	for (const [i, prop] of props.entries()) {
-		if (typeof c[prop] == 'object') {
+		if (typeof object[prop] == 'object') {
 			query += 'null'
 		} else {
-			query += typeof c[prop] == 'string' ? `'${c[prop]}'` : `${c[prop]}`
+			query += typeof object[prop] == 'string' ? `'${object[prop]}'` : `${object[prop]}`
 		}
 		query += (i == props.length - 1) ? '' : ', '
 	}
@@ -37,12 +34,12 @@ module.exports.insertCase = async (c) => {
 	await client.query(query)
 	client.release()
 }
-module.exports.updateCase = async (id, changes) => {
-	let query = 'update public.cases set '
-	const props = []
-	for (prop in changes) {
-		props.push(prop)
-	}
+module.exports.insertCase = async (c) => {
+	this.insertRecord('public.cases', c)
+}
+module.exports.updateRecord = async (table, id, changes) => {
+	let query = `update ${table} set `
+	const props = Object.keys(changes)
 	for (const [i, prop] of props.entries()) {
 		query += `${prop} = `
 		query += typeof changes[prop] == 'string' ? `'${changes[prop]}'` : `${changes[prop]}`
@@ -53,9 +50,15 @@ module.exports.updateCase = async (id, changes) => {
 	await client.query(query)
 	client.release()
 }
-module.exports.getData = async () => {
+module.exports.updateCase = async (id, changes) => {
+	this.updateRecord('public.cases', id, changes)
+}
+module.exports.getCaseData = async () => {
+	this.query('select * from public.cases order by id')
+}
+module.exports.query = async (query) => {
 	const client = await pool.connect()
-	const cases = await client.query('select * from public.cases order by id')
+	const cases = await client.query(query)
 	client.release()
 	return cases.rows
 }
