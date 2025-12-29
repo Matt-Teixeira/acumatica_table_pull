@@ -17,6 +17,9 @@ const cookie_parser = (resHeaderData) => {
     const newArray = [aspxAuth, aspNet, time, branch, reqId, reqState]
     const newStr = newArray.join("; ");
 
+    console.log("\nnewStr");
+    console.log(newStr);
+
     return newStr;
 }
 

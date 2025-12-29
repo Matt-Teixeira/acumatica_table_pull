@@ -12,6 +12,9 @@ const runJob = async (acumaticLogin, acumaticEquipEndpoint) => {
   const cookies = await call_api(acumaticLogin);
   const equipmentData = await get_api_data(acumaticEquipEndpoint, cookies);
 
+  console.log("equipmentData");
+  console.log(equipmentData);
+
   return equipmentData;
 };
 

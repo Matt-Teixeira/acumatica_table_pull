@@ -7,13 +7,14 @@ const {
   addition_reduction_delta,
   insert_new_systems,
   find_deep_deltas,
-  update_table_deltas,
+  update_table_deltas
 } = require("./jobs");
+const { get_rtt_odata } = require("./api_call");
 
 const run_job = async () => {
   await log("info", "NA", "NA", "run_job", `FN CALL`);
-  const equipment_data = await api_call();
-  const formatted_data = await format_api_data(equipment_data);
+  const equipment_data = await get_rtt_odata();
+  const formatted_data = await format_api_data(equipment_data.value);
 
   // addition_reduction_delta returns new and systems that may need to be removed.
   // addition_reduction_delta also returns db data to prevent second call.
@@ -40,7 +41,7 @@ const on_boot = async () => {
   } catch (error) {
     console.log(error);
     await log("error", "NA", "NA", "on_boot", `FN CALL`, {
-      error,
+      error
     });
   }
 };
