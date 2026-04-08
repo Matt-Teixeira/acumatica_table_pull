@@ -1,6 +1,5 @@
 ("use strict");
 require("dotenv").config();
-const { log } = require("./logger");
 const {
   api_call,
   format_api_data,
@@ -12,7 +11,6 @@ const {
 const { get_rtt_odata } = require("./api_call");
 
 const run_job = async () => {
-  await log("info", "NA", "NA", "run_job", `FN CALL`);
   const equipment_data = await get_rtt_odata();
 
   const formatted_data = await format_api_data(equipment_data.value);
@@ -35,15 +33,9 @@ const run_job = async () => {
 
 const on_boot = async () => {
   try {
-    // TYPE (info, warn, error), JOBID (NA FOR NOW), SME (NA FOR NOW), FN NAME, FN EVENT, {k/v}s
-    await log("info", "NA", "NA", "on_boot", `FN CALL`);
-
     run_job();
   } catch (error) {
     console.log(error);
-    await log("error", "NA", "NA", "on_boot", `FN CALL`, {
-      error
-    });
   }
 };
 

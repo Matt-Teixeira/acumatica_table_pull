@@ -1,13 +1,10 @@
 ("use strict");
 require("dotenv").config();
-const { log } = require("../logger");
 
 const find_deep_deltas = async (api_data, db_data) => {
   const delta = [];
 
   try {
-    await log("info", "NA", "NA", "find_deep_deltas", `FN CALL`);
-
     // Check what is in api that isn't in the database (add system)
     for await (let system of api_data) {
       const found = db_data.find(
@@ -15,10 +12,6 @@ const find_deep_deltas = async (api_data, db_data) => {
       );
 
       if (found === undefined) {
-        await log("warn", "NA", "NA", "find_deep_deltas", `FN CALL`, {
-          sme: system.equipmentnbr,
-          message: "Found in api, but not database",
-        });
         continue;
       }
 
@@ -38,16 +31,9 @@ const find_deep_deltas = async (api_data, db_data) => {
       }
     }
 
-    await log("info", "NA", "NA", "find_deep_deltas", `FN CALL`, {
-      deltas: delta,
-    });
-
     return delta;
   } catch (error) {
     console.log(error);
-    await log("error", "NA", "NA", "find_deep_deltas", `FN CALL`, {
-      error: error,
-    });
   }
 };
 

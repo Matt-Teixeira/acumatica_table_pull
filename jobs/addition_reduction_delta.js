@@ -1,11 +1,9 @@
 ("use strict");
 require("dotenv").config();
-const { log } = require("../logger");
 const { bulk_db_query } = require("../utils/queries");
 
 const addition_reduction_delta = async (apiEquipmentData) => {
   try {
-    await log("info", "NA", "NA", "addition_reduction_delta", `FN CALL`);
     const add_remove = {
       add: [],
       remove: [],
@@ -35,19 +33,12 @@ const addition_reduction_delta = async (apiEquipmentData) => {
       }
     }
 
-    await log("info", "NA", "NA", "addition_reduction_delta", `FN CALL`, {
-      add_remove,
-    });
-
     return {
         add_remove,
         db_data
     };
   } catch (error) {
     console.log(error);
-    await log("error", "NA", "NA", "addition_reduction_delta", `FN CALL`, {
-      error: error,
-    });
   }
 };
 

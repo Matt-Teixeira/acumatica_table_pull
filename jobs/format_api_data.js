@@ -1,10 +1,8 @@
 ("use strict");
 require("dotenv").config();
-const { log } = require("../logger");
 
 async function format_api_data(equipmentData) {
   try {
-    await log("info", "NA", "NA", "format_api_data", `FN CALL`);
     const formatted_data = [];
 
     for await (let system of equipmentData) {
@@ -35,9 +33,7 @@ async function format_api_data(equipmentData) {
     }
     return formatted_data;
   } catch (error) {
-    await log("error", "NA", "NA", "format_api_data", `FN CALL`, {
-      error: error.message
-    });
+    console.log(error);
   }
 }
 

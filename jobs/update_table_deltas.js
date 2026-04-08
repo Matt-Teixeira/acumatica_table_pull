@@ -1,12 +1,9 @@
 ("use strict");
 require("dotenv").config();
-const { log } = require("../logger");
 const { update_table } = require("../utils/queries");
 
 const updateAcuTableDeltas = async (deltas) => {
   try {
-    await log("info", "NA", "NA", "updateAcuTableDeltas", `FN CALL`);
-
     for await (const delta of deltas) {
       let keys = Object.keys(delta.deltas.api);
 
@@ -15,9 +12,7 @@ const updateAcuTableDeltas = async (deltas) => {
       }
     }
   } catch (error) {
-    await log("error", "NA", "NA", "updateAcuTableDeltas", `FN CALL`, {
-      error: error,
-    });
+    console.log(error);
   }
 };
 

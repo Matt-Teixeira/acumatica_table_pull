@@ -1,28 +1,21 @@
-const { log } = require("../logger");
 const pgPool = require("../db/pg_pool");
 
 const bulk_db_query = async () => {
   try {
-    await log("info", "NA", "NA", "bulk_db_query", `FN CALL`);
     const data = await pgPool.query("SELECT * FROM acumatica_systems");
     return data.rows;
   } catch (error) {
-    await log("error", "NA", "NA", "bulk_db_query", `FN CALL`, { error });
+    console.log(error);
   }
 };
 
 const table_insert = async (values) => {
   try {
-    await log("info", "NA", "NA", "table_insert", `FN CALL`, {
-      values,
-    });
     const queryStr =
       "INSERT INTO acumatica_systems(EquipmentNbr, CustomerContractCustomerID, CustomerUniqueID, CustomerContractCustomerName, ServiceContractCustomerID, ServiceContractCustomerName, State, City, AddressLine1, PostalCode, Manufacturer, Modality, Model, SerialNbr, Room) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)";
     await pgPool.query(queryStr, values);
   } catch (error) {
-    await log("error", "NA", "NA", "table_insert", `FN CALL`, {
-      error: error.message,
-    });
+    console.log(error);
   }
 };
 
@@ -109,16 +102,9 @@ async function update_table(delta, key) {
 
     await pgPool.query(queryString, values);
 
-    await log("info", "NA", "NA", "update_table", `FN CALL`, {
-      query: queryString,
-      values
-    });
-
     return true;
   } catch (error) {
-    await log("error", "NA", "NA", "update_table", `FN CALL`, {
-      error: error.message,
-    });
+    console.log(error);
   }
 }
 
