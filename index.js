@@ -14,6 +14,10 @@ const { get_rtt_odata } = require("./api_call");
 const run_job = async () => {
   await log("info", "NA", "NA", "run_job", `FN CALL`);
   const equipment_data = await get_rtt_odata();
+
+  console.log("\nequipment_data");
+  console.log(equipment_data);
+  return;
   const formatted_data = await format_api_data(equipment_data.value);
 
   // addition_reduction_delta returns new and systems that may need to be removed.
