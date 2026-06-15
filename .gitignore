@@ -6,3 +6,4 @@ db/backup/*.tar
 deltaStore
 migrationQueries/
 *.pem
+*.crt
