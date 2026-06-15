@@ -15,7 +15,7 @@ The acumatica_systems table is utilized as an intermediate table set for modific
     * Determine which systems are in Acumatica, but not in the database
         * Append to add list
     * Determine which systems are in the database, but not in Acumatica
-        * Append to remove list
+        * Logged as a warning only — these rows are **not** deleted
     * Determine "deep" delta & log differences in values for properties associated with each system
 
         ### EXAMPLE OF DELTA
@@ -35,4 +35,3 @@ The acumatica_systems table is utilized as an intermediate table set for modific
 
 3. Insert new systems into acumatica_systems table
 4. Update acumatica_systems table according to deltas
-5. Queries ran against acumatica_systems, as well as their values, are logged.
