@@ -1,7 +1,7 @@
 {
   "name": "acumatica_table_pull",
   "version": "1.0.0",
-  "description": "",
+  "description": "Syncs Acumatica equipment data into the acumatica_systems Postgres table.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/Matt-Teixeira/acumatica_table_pull.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Matt Teixeira",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Matt-Teixeira/acumatica_table_pull/issues"

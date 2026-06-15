@@ -1,7 +1,5 @@
-("use strict");
 require("dotenv").config();
 const {
-  api_call,
   format_api_data,
   addition_reduction_delta,
   insert_new_systems,
@@ -9,19 +7,28 @@ const {
   update_table_deltas
 } = require("./jobs");
 const { get_rtt_odata } = require("./api_call");
+const pgPool = require("./db/pg_pool");
 
 const run_job = async () => {
   const equipment_data = await get_rtt_odata();
 
   const formatted_data = await format_api_data(equipment_data.value);
 
-  // addition_reduction_delta returns new and systems that may need to be removed.
-  // addition_reduction_delta also returns db data to prevent second call.
-  const addition_removal_deltas = await addition_reduction_delta(
-    formatted_data
-  );
+  // addition_reduction_delta returns systems to add and systems that no longer
+  // exist in Acumatica. It also returns the db data to avoid a second query.
+  const addition_removal_deltas = await addition_reduction_delta(formatted_data);
 
-  await insert_new_systems(addition_removal_deltas.add_remove.add);
+  const { add, remove } = addition_removal_deltas.add_remove;
+
+  // Removed systems are logged only — never deleted from the table.
+  if (remove.length) {
+    console.warn(
+      `Detected ${remove.length} system(s) in DB but not in Acumatica (not deleted):`,
+      remove.map((s) => s.equipmentnbr)
+    );
+  }
+
+  await insert_new_systems(add);
 
   const deltas = await find_deep_deltas(
     formatted_data,
@@ -31,12 +38,15 @@ const run_job = async () => {
   if (deltas.length) await update_table_deltas(deltas);
 };
 
-const on_boot = async () => {
+const main = async () => {
   try {
-    run_job();
+    await run_job();
   } catch (error) {
-    console.log(error);
+    console.error("Acumatica sync failed:", error);
+    process.exitCode = 1;
+  } finally {
+    await pgPool.end();
   }
 };
 
-on_boot();
+main();

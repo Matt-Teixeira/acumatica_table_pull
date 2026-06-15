@@ -1,16 +1,9 @@
 const { table_insert } = require("../utils/queries");
 
 async function insert_new_systems(equipmentArray) {
-  try {
-    for await (let system of equipmentArray) {
-      const valuesArray = [];
-      for (const prop in system) {
-        valuesArray.push(system[prop]);
-      }
-      await table_insert(valuesArray);
-    }
-  } catch (error) {
-    console.log(error);
+  for (const system of equipmentArray) {
+    const valuesArray = Object.values(system);
+    await table_insert(valuesArray);
   }
 }
 
