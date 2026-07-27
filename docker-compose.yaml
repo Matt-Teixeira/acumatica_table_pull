@@ -1,10 +1,11 @@
 services:
   app:
     image: node:lts
-    # Run as host UID : docker GID so bind-mounted files stay editable on the
-    # host and the shared /opt dirs (group docker, setgid) stay writable.
-    # UID = `id -u` of the deploy user; GID = `getent group docker`.
-    user: "1006:987"
+    # Run as the svc service account : docker GID (matches incident-engine and
+    # ops-dashboard) so job-written files belong to the service identity, not a
+    # human deploy user. UID = `id -u svc`; GID = `getent group docker`.
+    # Shared /opt dirs (group docker, setgid) stay group-writable either way.
+    user: "105:987"
     # No env_file here: the app loads .env itself via dotenv (index.js), which
     # strips quotes and does NOT expand $ — so the Acumatica URIs with
     # $expand/$format reach the app intact.
