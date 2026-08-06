@@ -1,19 +1,27 @@
 services:
   app:
-    image: node:lts
-    # Run as the svc service account : docker GID (matches incident-engine and
-    # ops-dashboard) so job-written files belong to the service identity, not a
-    # human deploy user. UID = `id -u svc`; GID = `getent group docker`.
-    # Shared /opt dirs (group docker, setgid) stay group-writable either way.
-    user: "105:987"
+    # Built from this repo's Dockerfile, matching the rest of the fleet: the
+    # baked gosu entrypoint drops to RUN_USER, so job-written files belong to
+    # the service identity rather than a human deploy user. This replaces the
+    # former `image: node:lts` + hardcoded `user: "105:987"`, which pinned
+    # staging's UID/GID into a file the dev host also uses.
+    image: acu-sync:${IMAGE_TAG}
+    build:
+      context: .
+      # Host identity comes from .env so this file stays host-agnostic and the
+      # dev and staging branches can share it. See .env.example.
+      args:
+        DOCKER_GID: ${DOCKER_GID}
+        UID_0: ${UID_0}
+        UID_1: ${UID_1}
+        UID_2: ${UID_2}
     # No env_file here: the app loads .env itself via dotenv (index.js), which
     # strips quotes and does NOT expand $ — so the Acumatica URIs with
     # $expand/$format reach the app intact.
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      # HOME for a non-baked user id; keeps npm/node from writing to /
-      HOME: /tmp
+      RUN_USER: ${RUN_USER:-svc}
       NPM_CONFIG_CACHE: /tmp/.npm
     working_dir: /workspace
     volumes:
