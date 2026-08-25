@@ -14,6 +14,12 @@ ARG UID_0
 ARG UID_1
 ARG UID_2
 
+# Image identity: acu-sync:<username> for dev builds, acu-sync:svc for the
+# release (compose interpolates the tag from USER_ID; build.sh passes it
+# through). No default — an unset USER_ID must fail loudly, not tag "acu-sync:".
+ARG USER_ID
+LABEL version="${USER_ID}"
+
 # Match host docker group GID so bind-mounted files are accessible
 RUN set -eux; \
     if getent group docker >/dev/null; then \

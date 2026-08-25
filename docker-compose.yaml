@@ -1,16 +1,16 @@
 services:
   app:
-    # Built from this repo's Dockerfile, matching the rest of the fleet: the
-    # baked gosu entrypoint drops to RUN_USER, so job-written files belong to
-    # the service identity rather than a human deploy user. This replaces the
-    # former `image: node:lts` + hardcoded `user: "105:987"`, which pinned
-    # staging's UID/GID into a file the dev host also uses.
-    image: acu-sync:${IMAGE_TAG}
+    # USER_ID drives the tag: acu-sync:<username> for dev builds, acu-sync:svc
+    # for the release copy (flipped by #RELEASE:USER_ID=svc at release time).
+    # The baked gosu entrypoint drops to RUN_USER, so job-written files belong
+    # to the service identity rather than a human deploy user.
+    image: acu-sync:${USER_ID}
     build:
       context: .
       # Host identity comes from .env so this file stays host-agnostic and the
       # dev and staging branches can share it. See .env.example.
       args:
+        USER_ID: ${USER_ID}
         DOCKER_GID: ${DOCKER_GID}
         UID_0: ${UID_0}
         UID_1: ${UID_1}
@@ -21,18 +21,22 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      RUN_USER: ${RUN_USER:-svc}
+      # Intentionally unset in .env: empty -> entrypoint.sh defaults to svc,
+      # so ONE place decides the production identity. Dev runs pass it on the
+      # command line. ':-' silences the compose WARN.
+      RUN_USER: ${RUN_USER:-}
       NPM_CONFIG_CACHE: /tmp/.npm
     working_dir: /workspace
     volumes:
-      # Project source - live edits on host reflect in container
+      # Project source — live edits on host reflect in container. node_modules
+      # is IN-TREE (installed by build.sh as the host user), so it rides along
+      # in this mount. The shared /opt/resources/node_mod_cache mount is
+      # retired (monday precedent, 2026-08-25): each copy (dev clone, release)
+      # owns its own deps.
       - ./:/workspace
 
-      # Persistent node_modules cache (survives container removal)
-      - /opt/resources/node_mod_cache/acumatica_sync:/workspace/node_modules
-
-      # Centralized run logs
-      - /opt/run-logs/acumatica_sync:/opt/run-logs/acumatica_sync
+      # Read-only host resources (SSL CA for Postgres at PG_SSL_PATH)
+      - /opt/resources:/opt/resources:ro
     networks:
       - pg_net
 

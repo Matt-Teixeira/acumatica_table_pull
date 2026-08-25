@@ -67,6 +67,28 @@ Keys the code actually reads: `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`,
   DB-roles rollout (setup doc, where this app is third in the queue) — do not
   flip it here in passing.
 
+## Building & running
+
+```bash
+bash build.sh                                   # npm install (in-tree) + image acu-sync:${USER_ID}
+
+# Development — from the dev tree (~/apps/acumatica_sync), as yourself
+RUN_USER=<you> docker compose run --rm app node index.js
+
+# Production — from the release copy, RUN_USER omitted so entrypoint.sh
+# defaults to svc (one place decides the identity)
+cd /opt/apps/acumatica_sync && docker compose run --rm app node index.js
+```
+
+- `node_modules` is **in-tree**, installed by `build.sh` as the calling host
+  user. The former shared-cache mount
+  (`/opt/resources/node_mod_cache/acumatica_sync`) is retired — do not
+  reintroduce it. The old `docs/run.sh` "npm ci to nuke the cache" pattern
+  died with it.
+- **A dev run is a real run**: same staging DB, same prod Acumatica endpoint
+  as production. There is no sandbox mode — snapshot `acumatica_systems`
+  first if you need to review what a run will change.
+
 ## Run record — `stats.job_runs`
 
 Every run inserts one row into the shared `stats.job_runs` table
@@ -80,7 +102,7 @@ the boot console line, not in a column. SIGTERM/SIGINT record a killed run
 
 - [x] Freeze live tree, back up `.env`, create dev clone (2026-08-25)
 - [x] CLAUDE.md mid-migration banner (this commit)
-- [ ] Identity build: `acu-sync:${USER_ID}` tag, in-tree node_modules, `build.sh`
+- [x] Identity build: `acu-sync:${USER_ID}` tag, in-tree node_modules, `build.sh`
 - [ ] Deny-by-default `.dockerignore`
 - [ ] `build-release.sh` + boot provenance line + `stats.job_runs` record + kill handlers
 - [ ] `preflight-check.sh`
