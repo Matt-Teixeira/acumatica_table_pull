@@ -1,13 +1,10 @@
 # CLAUDE.md
 
-> **⚠️ MID-MIGRATION (started 2026-08-25).** This app is being aligned to the fleet
-> dev/release paradigm — the spec is
-> `data_acquisition/docs/migration_CLAUDE.md` (Part 1 = conventions, Part 3 =
-> checklist). Until this banner is removed, THAT document outranks this one
-> wherever they disagree. Sections below are corrected in the same commit as the
-> change that makes them true; anything not yet corrected may describe the
-> pre-migration state. Reference implementations: `~/apps/data_acquisition`
-> (pilot), `~/apps/monday` (closest shape: no file logger, external-API app).
+> **Migrated to the fleet dev/release paradigm 2026-08-25** (fourth, after
+> data_acquisition, monday, part-source-pipeline). Conventions:
+> `data_acquisition/docs/migration_CLAUDE.md` (Part 1). The editable git clone
+> is `~/apps/acumatica_sync`; **`/opt/apps/acumatica_sync` is build output
+> produced only by `build-release.sh`** — never edit it, it is not a checkout.
 
 **acumatica_sync** is a Node.js run-once job that syncs equipment data from the
 Acumatica ERP into the `public.acumatica_systems` Postgres table. One job, no
@@ -98,12 +95,25 @@ error message — the monday pattern. **No schema changes to that shared table**
 the boot console line, not in a column. SIGTERM/SIGINT record a killed run
 (status `error`, honest exit 1) via a once-guarded handler.
 
-## Migration status (transient — delete with the banner)
+## Release workflow
 
-- [x] Freeze live tree, back up `.env`, create dev clone (2026-08-25)
-- [x] CLAUDE.md mid-migration banner (this commit)
-- [x] Identity build: `acu-sync:${USER_ID}` tag, in-tree node_modules, `build.sh`
-- [x] Deny-by-default `.dockerignore`
-- [x] `build-release.sh` + boot provenance line + `stats.job_runs` record + kill handlers
-- [x] `preflight-check.sh`
-- [ ] Cutover: release to `/opt/apps/acumatica_sync`, verify, banner off
+```bash
+cd ~/apps/acumatica_sync         # commit + push first — the guard refuses a dirty tree
+bash build-release.sh            # wipe-and-mirror to /opt/apps/acumatica_sync,
+                                 # apply #RELEASE: overrides, stamp RELEASE_SHA,
+                                 # build acu-sync:svc (as svc, HOME=/opt/apps/.svc-home)
+
+# Verify a release:
+grep '^RELEASE_SHA=' /opt/apps/acumatica_sync/.env      # = the commit you shipped
+(cd /opt/apps/acumatica_sync && bash preflight-check.sh) # zero warnings expected
+```
+
+- `build-release.sh` preserves `/opt/apps/acumatica_sync/node_modules` across
+  releases as an install cache. Never `HOME=/tmp` for svc builds — use
+  `/opt/apps/.svc-home` (the script does).
+- Cutover verified 2026-08-25 at `0e2a704`: release smoke run as svc
+  (105:987), boot line printed the SHA, `stats.job_runs` row `success`,
+  `diff -r` release vs clone clean, dirty-tree refusal and SIGTERM kill-row
+  both negative-tested.
+- The pre-migration `.env` and a pre-migration `acumatica_systems` dump live
+  in `~/env-backups/` (2026-08-25).
