@@ -105,5 +105,5 @@ the boot console line, not in a column. SIGTERM/SIGINT record a killed run
 - [x] Identity build: `acu-sync:${USER_ID}` tag, in-tree node_modules, `build.sh`
 - [x] Deny-by-default `.dockerignore`
 - [x] `build-release.sh` + boot provenance line + `stats.job_runs` record + kill handlers
-- [ ] `preflight-check.sh`
+- [x] `preflight-check.sh`
 - [ ] Cutover: release to `/opt/apps/acumatica_sync`, verify, banner off
