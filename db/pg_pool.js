@@ -20,6 +20,13 @@ const pgPool = new Pool({
    database: process.env.PGDATABASE || process.env.PG_DB,
    port: process.env.PGPORT || process.env.PG_PORT,
    ssl: buildSsl(),
+   // Fleet pool standard (decided 2026-08-27): a hung connect must ERROR by
+   // 10s -- with no timeout, an unreachable DB hangs the run forever and the
+   // empty cron .out reads as "never ran". Idle sockets close after 60s;
+   // at most 15 connections per process.
+   max: 15,
+   idleTimeoutMillis: 60000,
+   connectionTimeoutMillis: 10000,
 });
 
 module.exports = pgPool;
