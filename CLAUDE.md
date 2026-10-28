@@ -100,11 +100,12 @@ the boot console line, not in a column. SIGTERM/SIGINT record a killed run
 ```bash
 cd ~/apps/acumatica_sync         # commit + push first — the guard refuses a dirty tree
 bash build-release.sh            # wipe-and-mirror to /opt/apps/acumatica_sync,
-                                 # apply #RELEASE: overrides, stamp RELEASE_SHA,
+                                 # apply #RELEASE: overrides, stamp RELEASE_SHA
+                                 # + RELEASE_AT (UTC release time),
                                  # build acu-sync:svc (as svc, HOME=/opt/apps/.svc-home)
 
 # Verify a release:
-grep '^RELEASE_SHA=' /opt/apps/acumatica_sync/.env      # = the commit you shipped
+grep -E '^RELEASE_(SHA|AT)=' /opt/apps/acumatica_sync/.env  # = the commit you shipped + when
 (cd /opt/apps/acumatica_sync && bash preflight-check.sh) # zero warnings expected
 ```
 
